@@ -49,7 +49,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="view_page">
      <widget class="QLabel" name="view_lbl">
@@ -228,6 +228,19 @@
       </property>
       <property name="text">
        <string>Save</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="view_warning_lbl">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>160</y>
+        <width>321</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Warning</string>
       </property>
      </widget>
     </widget>
@@ -727,6 +740,48 @@
         <width>113</width>
         <height>20</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="add_warning_lbl">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>260</y>
+        <width>451</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Warning</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radioButton_6">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>200</y>
+        <width>83</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>None</string>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">category_btn_grp</string>
+      </attribute>
+     </widget>
+     <widget class="QPushButton" name="auto_fill_btn">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>20</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Auto Fill</string>
       </property>
      </widget>
     </widget>
