@@ -57,6 +57,11 @@ class Manager(QMainWindow, Ui_MainWindow):
         self.add_expense_btn.clicked.connect(lambda: self.save_add_edit())
         self.auto_fill_btn.clicked.connect(lambda: self.auto_fill())
 
+        self.view_day_btn.clicked.connect(lambda: self.check_day())
+
+        self.check_day_warning_lbl.clear()
+        self.add_warning_lbl.clear()
+
         self.category_btn_grp.buttonClicked.connect(self.radio_button_selected)
         self.stackedWidget.setCurrentIndex(0)
 
@@ -136,7 +141,11 @@ class Manager(QMainWindow, Ui_MainWindow):
     def save_add_edit(self):
         try:
             month = int(self.month_lnedit.text())
+            if len(str(month)) < 2:
+                month = f'0{month}'
             day = int(self.day_lnedit.text())
+            if len(str(day)) < 2:
+                day = f'0{day}'
             year = int(self.year_lnedit.text())
             cost = float(self.expense_lnedit.text())
             income = float(self.income_lnedit.text())
@@ -145,6 +154,9 @@ class Manager(QMainWindow, Ui_MainWindow):
             self.add_warning_lbl.setText('Must include values for all fields in numbers')
             return
 
+        self.add_warning_lbl.clear()
+        self.income_lnedit.clear()
+        self.expense_lnedit.clear()
         exists = False
 
         with open('logs.csv', 'r') as csv_file:
@@ -159,8 +171,18 @@ class Manager(QMainWindow, Ui_MainWindow):
 
                     line[1] = str(float(line[1]) + income)
 
-                    if category == 1:
+                    if category == 0:
+                        pass
+                    elif category == 1:
                         line[2] = str(float(line[2]) + cost)
+                    elif category == 2:
+                        line[3] = str(float(line[3]) + cost)
+                    elif category == 3:
+                        line[4] = str(float(line[4]) + cost)
+                    elif category == 4:
+                        line[5] = str(float(line[5]) + cost)
+                    elif category == 5:
+                        line[6] = str(float(line[6]) + cost)
 
             # Write the modified content back to the file
         with open('logs.csv', 'w', newline='') as csv_file:
@@ -185,3 +207,37 @@ class Manager(QMainWindow, Ui_MainWindow):
                     data = [str(f'{month}{day}{year}'), str(income), '0', '0', '0', '0', str(cost)]
 
                 csv_writer.writerow(data)
+
+    def check_day(self):
+        try:
+            month = int(self.check_month_lnedit.text())
+
+            if len(str(month)) < 2:
+                month = f'0{month}'
+            day = int(self.check_day_lnedit.text())
+            if len(str(day)) < 2:
+                day = f'0{day}'
+            year = int(self.check_year_lnedit.text())
+        except:
+            self.check_day_warning_lbl.setText('Must include values for all fields in numbers')
+            return
+
+        self.check_day_warning_lbl.clear()
+
+        with open('logs.csv', 'r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            lines = list(csv.reader(csv_file))
+
+            for i, line in enumerate(lines):
+                if line and line[0] == str(f'{month}{day}{year}'):
+                    self.groceries_amount_lbl.setText(line[2])
+                    self.gas_amount_lbl.setText(line[3])
+                    self.fun_amount_lbl.setText(line[4])
+                    self.subscriptions_amount_lbl.setText(line[5])
+                    self.savings_amount_lbl_2.setText(line[6])
+                    self.income_amount_lbl.setText(line[1])
+
+                    total_expenses = (float(line[2]) + float(line[3]) + float(line[4]) + float(line[5]) + float(line[6]))
+
+                    self.tot_exp_lbl.setText(f'{total_expenses}')
+                    self.revenue_for_day_lbl.setText(f'{float(line[1]) - total_expenses}')
