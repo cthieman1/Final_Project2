@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import *
 from gui import *
 import csv
+import re
 
 
 class Manager(QMainWindow, Ui_MainWindow):
@@ -48,19 +49,21 @@ class Manager(QMainWindow, Ui_MainWindow):
         self.view_btn.clicked.connect(lambda: self.switch_page(0))
         self.check_day_btn.clicked.connect(lambda: self.switch_page(1))
         self.add_btn.clicked.connect(lambda: self.switch_page(2))
+        self.check_month_btn.clicked.connect(lambda: self.switch_page(3))
 
         self.set_amount_checking_btn.clicked.connect(lambda: self.set_checking())
         self.set_amount_saving_btn.clicked.connect(lambda: self.set_saving())
         self.set_amount_other_btn.clicked.connect(lambda: self.set_other())
-        self.save_btn.clicked.connect(lambda: self.save_view())
 
         self.add_expense_btn.clicked.connect(lambda: self.save_add_edit())
         self.auto_fill_btn.clicked.connect(lambda: self.auto_fill())
 
         self.view_day_btn.clicked.connect(lambda: self.check_day())
+        self.view_month_btn.clicked.connect(lambda: self.check_month())
 
         self.check_day_warning_lbl.clear()
         self.add_warning_lbl.clear()
+        self.check_month_warning_lbl.clear()
 
         self.category_btn_grp.buttonClicked.connect(self.radio_button_selected)
         self.stackedWidget.setCurrentIndex(0)
@@ -75,9 +78,13 @@ class Manager(QMainWindow, Ui_MainWindow):
     def update_display_view(self):
         self.view_warning_lbl.clear()
 
-        self.checkings_amount_lbl.setText(f'${self.__checkings_amount:.2f}')
-        self.savings_amount_lbl.setText(f'${self.__savings_amount:.2f}')
-        self.other_amount_lbl.setText(f'${self.__other_amount:.2f}')
+        with open('accounts.csv', 'r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            header = next(csv_reader, None)
+
+            self.checkings_amount_lbl.setText(f'${float(header[0]):.2f}')
+            self.savings_amount_lbl.setText(f'${float(header[1]):.2f}')
+            self.other_amount_lbl.setText(f'${float(header[2]):.2f}')
 
     def switch_page(self, index):
         self.stackedWidget.setCurrentIndex(index)
@@ -90,7 +97,9 @@ class Manager(QMainWindow, Ui_MainWindow):
             return
         self.__checkings_amount = new_value
         self.set_amount_checking_lnedit.clear()
+        self.save_view()
         self.update_display_view()
+
 
     def set_saving(self):
         try:
@@ -100,6 +109,7 @@ class Manager(QMainWindow, Ui_MainWindow):
             return
         self.__savings_amount = new_value
         self.set_amount_saving_lnedit.clear()
+        self.save_view()
         self.update_display_view()
 
     def set_other(self):
@@ -111,6 +121,7 @@ class Manager(QMainWindow, Ui_MainWindow):
 
         self.__other_amount = new_value
         self.set_amount_other_lnedit.clear()
+        self.save_view()
         self.update_display_view()
 
     def save_view(self):
@@ -158,6 +169,23 @@ class Manager(QMainWindow, Ui_MainWindow):
         self.income_lnedit.clear()
         self.expense_lnedit.clear()
         exists = False
+
+        # change account numbers
+
+        with open('accounts.csv', 'r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            header = next(csv_reader, None)
+
+            if category == 5:
+                data = [float(header[0]) + income - cost, float(header[1]) + cost, header[2]]
+            else:
+                data = [float(header[0]) + income - cost, header[1], header[2]]
+
+            with open('accounts.csv', 'w') as csv_file:
+                csv_writer = csv.writer(csv_file)
+                csv_writer.writerow(data)
+
+            self.update_display_view()
 
         with open('logs.csv', 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
@@ -241,3 +269,55 @@ class Manager(QMainWindow, Ui_MainWindow):
 
                     self.tot_exp_lbl.setText(f'{total_expenses}')
                     self.revenue_for_day_lbl.setText(f'{float(line[1]) - total_expenses}')
+
+    def check_month(self):
+        total_gas = 0
+        total_groceries = 0
+        total_fun = 0
+        total_subscriptions = 0
+        total_savings = 0
+        total_income = 0
+
+        try:
+            month = int(self.check_month_lnedit_2.text())
+            if len(str(month)) < 2:
+                month = f'0{month}'
+            year = int(self.check_year_lnedit_2.text())
+        except:
+            self.check_month_warning_lbl.setText('Must include values for all fields in numbers')
+            return
+
+        date_pattern = re.compile(r'^(\d{2})(\d{2})(\d{4})$')
+
+
+        with open('logs.csv', 'r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            header = next(csv_reader)
+
+            for line in csv_reader:
+                try:
+                    date_column = line[0]
+                except:
+                    pass
+                match = date_pattern.match(date_column)
+                if match:
+                    m, d, y = match.groups()
+
+                    # Check if the month and year match the desired values
+                    if m == str(month) and y == str(year):
+                        total_groceries += float(line[2])
+                        total_gas += float(line[3])
+                        total_fun += float(line[4])
+                        total_subscriptions += float(line[5])
+                        total_savings += float(line[6])
+                        total_income += float(line[1])
+
+        self.groceries_amount_lbl_2.setText(str(total_groceries))
+        self.gas_amount_lbl_2.setText(str(total_gas))
+        self.fun_amount_lbl_2.setText(str(total_fun))
+        self.subscriptions_amount_lbl_2.setText(str(total_subscriptions))
+        self.savings_amount_lbl_3.setText(str(total_savings))
+        self.income_amount_lbl_2.setText(str(total_income))
+        total_expenses = total_groceries + total_gas + total_fun + total_subscriptions + total_savings
+        self.total_expenses_lbl.setText(f'{total_expenses}')
+        self.total_revenue_lbl.setText(f'{total_income - total_expenses}')
