@@ -299,6 +299,9 @@ class Manager(QMainWindow, Ui_MainWindow):
 
                     self.tot_exp_lbl.setText(f'{total_expenses}')
                     self.revenue_for_day_lbl.setText(f'{float(line[1]) - total_expenses}')
+                    return
+
+            self.check_day_warning_lbl.setText('day could not be found')
 
     def check_month(self) -> None:
         """
@@ -322,6 +325,7 @@ class Manager(QMainWindow, Ui_MainWindow):
             return
 
         date_pattern = re.compile(r'^(\d{2})(\d{2})(\d{4})$')
+        self.check_month_warning_lbl.clear()
 
         with open('logs.csv', 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
