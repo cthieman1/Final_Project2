@@ -28,7 +28,7 @@ class Manager(QMainWindow, Ui_MainWindow):
         except:
             with open('accounts.csv', 'w') as csv_file:
                 csv_writer = csv.writer(csv_file)
-                data = [0,0,0]
+                data = [0, 0, 0]
                 csv_writer.writerow(data)
 
                 self.__checkings_amount = 0
@@ -56,7 +56,6 @@ class Manager(QMainWindow, Ui_MainWindow):
         self.set_amount_other_btn.clicked.connect(lambda: self.set_other())
 
         self.add_expense_btn.clicked.connect(lambda: self.save_add_edit())
-        self.auto_fill_btn.clicked.connect(lambda: self.auto_fill())
 
         self.view_day_btn.clicked.connect(lambda: self.check_day())
         self.view_month_btn.clicked.connect(lambda: self.check_month())
@@ -68,14 +67,11 @@ class Manager(QMainWindow, Ui_MainWindow):
         self.category_btn_grp.buttonClicked.connect(self.radio_button_selected)
         self.stackedWidget.setCurrentIndex(0)
 
-    def auto_fill(self):
-        self.month_lnedit.setText('1')
-        self.day_lnedit.setText('1')
-        self.year_lnedit.setText('1')
-        self.expense_lnedit.setText('10')
-        self.income_lnedit.setText('0')
-
-    def update_display_view(self):
+    def update_display_view(self) -> None:
+        """
+        updates the numbers displayed on the view page for account balances
+        :return: none
+        """
         self.view_warning_lbl.clear()
 
         with open('accounts.csv', 'r') as csv_file:
@@ -86,10 +82,19 @@ class Manager(QMainWindow, Ui_MainWindow):
             self.savings_amount_lbl.setText(f'${float(header[1]):.2f}')
             self.other_amount_lbl.setText(f'${float(header[2]):.2f}')
 
-    def switch_page(self, index):
+    def switch_page(self, index: int) -> None:
+        """
+        switches the current page based on the index given
+        :param index: index of new page
+        :return: none
+        """
         self.stackedWidget.setCurrentIndex(index)
 
-    def set_checking(self):
+    def set_checking(self) -> None:
+        """
+        sets the amount in checkings directly
+        :return: none
+        """
         try:
             new_value = float(self.set_amount_checking_lnedit.text())
         except:
@@ -100,8 +105,11 @@ class Manager(QMainWindow, Ui_MainWindow):
         self.save_view()
         self.update_display_view()
 
-
-    def set_saving(self):
+    def set_saving(self) -> None:
+        """
+        directly changes the amount in savings
+        :return: none
+        """
         try:
             new_value = float(self.set_amount_saving_lnedit.text())
         except:
@@ -112,7 +120,11 @@ class Manager(QMainWindow, Ui_MainWindow):
         self.save_view()
         self.update_display_view()
 
-    def set_other(self):
+    def set_other(self) -> None:
+        """
+        directly changes the amount in other
+        :return: none
+        """
         try:
             new_value = float(self.set_amount_other_lnedit.text())
         except:
@@ -124,7 +136,11 @@ class Manager(QMainWindow, Ui_MainWindow):
         self.save_view()
         self.update_display_view()
 
-    def save_view(self):
+    def save_view(self) -> None:
+        """
+        saves the state of accounts to the accounts csv file
+        :return: none
+        """
         data = [self.__checkings_amount, self.__savings_amount, self.__other_amount]
         with open('accounts.csv', 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
@@ -134,7 +150,12 @@ class Manager(QMainWindow, Ui_MainWindow):
                 csv_writer = csv.writer(csv_file)
                 csv_writer.writerow(data)
 
-    def radio_button_selected(self, button):
+    def radio_button_selected(self, button) -> None:
+        """
+        sets the active radio button index to the radio button clicked
+        :param button: the radio button that was clicked
+        :return: none
+        """
         self.__active_radio_button = button.text()
         if self.__active_radio_button == 'None':
             self.__active_radio_button = 0
@@ -149,7 +170,11 @@ class Manager(QMainWindow, Ui_MainWindow):
         elif self.__active_radio_button == 'Savings':
             self.__active_radio_button = 5
 
-    def save_add_edit(self):
+    def save_add_edit(self) -> None:
+        """
+        saves an added expense to a day and saves to the logs csv file
+        :return: none
+        """
         try:
             month = int(self.month_lnedit.text())
             if len(str(month)) < 2:
@@ -191,7 +216,7 @@ class Manager(QMainWindow, Ui_MainWindow):
             csv_reader = csv.reader(csv_file)
             lines = list(csv.reader(csv_file))
 
-        # if log already exists for day
+            # if log already exists for day
             for i, line in enumerate(lines):
                 if line and line[0] == str(f'{month}{day}{year}'):
                     # Modify the line with new values
@@ -236,7 +261,11 @@ class Manager(QMainWindow, Ui_MainWindow):
 
                 csv_writer.writerow(data)
 
-    def check_day(self):
+    def check_day(self) -> None:
+        """
+        gets and displays the values for a certain days numbers
+        :return: none
+        """
         try:
             month = int(self.check_month_lnedit.text())
 
@@ -265,12 +294,17 @@ class Manager(QMainWindow, Ui_MainWindow):
                     self.savings_amount_lbl_2.setText(line[6])
                     self.income_amount_lbl.setText(line[1])
 
-                    total_expenses = (float(line[2]) + float(line[3]) + float(line[4]) + float(line[5]) + float(line[6]))
+                    total_expenses = (
+                                float(line[2]) + float(line[3]) + float(line[4]) + float(line[5]) + float(line[6]))
 
                     self.tot_exp_lbl.setText(f'{total_expenses}')
                     self.revenue_for_day_lbl.setText(f'{float(line[1]) - total_expenses}')
 
-    def check_month(self):
+    def check_month(self) -> None:
+        """
+        gets and displays the values for a months combined numbers
+        :return: none
+        """
         total_gas = 0
         total_groceries = 0
         total_fun = 0
@@ -288,7 +322,6 @@ class Manager(QMainWindow, Ui_MainWindow):
             return
 
         date_pattern = re.compile(r'^(\d{2})(\d{2})(\d{4})$')
-
 
         with open('logs.csv', 'r') as csv_file:
             csv_reader = csv.reader(csv_file)

@@ -49,7 +49,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="view_page">
      <widget class="QLabel" name="view_lbl">
@@ -537,7 +537,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Revenue for day</string>
+       <string>Net Income</string>
       </property>
      </widget>
      <widget class="QLabel" name="revenue_for_day_lbl">
@@ -823,19 +823,6 @@
        <string notr="true">category_btn_grp</string>
       </attribute>
      </widget>
-     <widget class="QPushButton" name="auto_fill_btn">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>20</y>
-        <width>75</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Auto Fill</string>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label_9">
@@ -1115,12 +1102,12 @@
        <rect>
         <x>130</x>
         <y>240</y>
-        <width>61</width>
+        <width>71</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Revenue</string>
+       <string>Net Income</string>
       </property>
      </widget>
      <widget class="QLabel" name="total_revenue_lbl">
